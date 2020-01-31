@@ -11,7 +11,7 @@ context.global.heishamon.HAapplication = "Domoticz, InfluxDB";
 //This is the overview of sensors which has to be sent to the Home Automation system
 context.global.heishamon.SensorMapping = [
         // ["name of topic", "IDx in Domoticz/Name in Home Assistant/ ?? openHAB ??"]
-         //                   Dummy IDX    -----     ------Set--- Topic----Custom Device name ---- Device type ---  Units                           
+         //                    Dummy IDX         -----        ------Set--- Topic----Custom Device name ---- Device type ---  Units                           
             //["Heatpump_State",12500,"Switch"],       		//SET1 // TOP0   x  NR: WP-Pana On / Off -- Light/Switch 
             ["Pump_Flow",12524],                      	  		// TOP1   x  NR: WP-Pomp -- Custom Sensor	-- unit= :L/m 
             //["Force_DHW_State",12951, "Switch"],		//SET10 // TOP2   /  NR: WP-Warmwater Status -- Light/Switch
