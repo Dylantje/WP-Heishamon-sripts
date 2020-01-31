@@ -1,0 +1,128 @@
+if (!context.global.heishamon) {
+  context.global.heishamon = {};
+}
+
+// write down the Home Automation applications used
+// Possible values: Domoticz, InfluxDB, openHAB, HomeAssistant
+// comma seperated and case sensitive
+context.global.heishamon.HAapplication = "Domoticz, InfluxDB";
+
+
+//This is the overview of sensors which has to be sent to the Home Automation system
+context.global.heishamon.SensorMapping = [
+        // ["name of topic", "IDx in Domoticz/Name in Home Assistant/ ?? openHAB ??"]
+         //                   Dummy IDX    -----     ------Set--- Topic----Custom Device name ---- Device type ---  Units                           
+            //["Heatpump_State",12500, "Switch"],       	            //SET1 // TOP0   x  NR: WP-Pana On / Off -- Light/Switch 
+            ["Pump_Flow",12524],                      	  		        // TOP1   x  NR: WP-Pomp -- Custom Sensor	-- unit= :L/m 
+            //["Force_DHW_State",12951, "Switch"],		                //SET10 // TOP2   /  NR: WP-Warmwater Status -- Light/Switch
+            ["Quiet_Mode_Schedule",12501],                    	        // TOP3   /  NR: WP-Stil Menu ST -- Light/Switch
+            //["Operating_Mode_State	", 12896, "Selector Switch"],   //SET9 // TOP4 x    NR: WP-Mode State -- Selector Switch -- make 7 levels - (0=Heat only, 10=Cool only, 20=Auto, 30=DHW only, 40=Heat+DHW, 50=Cool+DHW, 60=Auto+DHW)
+            ["Main_Inlet_Temp",12494],                                  // TOP5   x  NR: WP-In [ Retour ] -- Temp
+            ["Main_Outlet_Temp",12493],                                 // TOP6   x  NR: WP-Out [ Aanvoer] -- Temp
+            ["Main_Target_Temp",12898],                                 // TOP7   x  NR: WP-Water_Target_Temp -- Temp
+            ["Compressor_Freq",12526],                                  // TOP8   x  NR: WP-Freq -- Custom Sensor -- unit= :Hz
+            //["DHW_Target_Temp", null],                                // TOP9     Your name here -- Thermostat	SetPoint
+            //["DHW_Temp", null],                                       // TOP10    Your name here  -- Temp
+            ["Operations_Hours",12499],                                 // TOP11  x  NR: WP-Bedrijfstijd -- RFXMeter counter -- unit= :Hours 
+            ["Operations_Counter",12498],                               // TOP12  x NR: WP-Start/Stops -- RFXMeter counter -- unit= x :On / Off
+            ["Main_Schedule_State",12899, "Switch"],   	                // TOP13  x NR: NR: WP-Weektimer ST -- Light/Switch
+            ["Outside_Temp",12495],                                     // TOP14  x NR: WP-Buiten -- Temp
+            ["Heat_Energy_Production",12900],                           // TOP15  x NR: WP-Productie -- Usage
+            ["Heat_Energy_Consumption",12901],                          // TOP16  x NR: WP-Verbruik -- Usage 
+            ["Powerful_Mode_Time",12955,"Selector Switch"],             //SET4  // TOP17  x  idx voor time: 12902 NR: WP-Extra Power Time ST -- Selector Switch -- make 4 levels -- 0= off - 10= 30 Minute - 20= 60 Minute - 30= 90 Minute
+            ["Quiet_Mode_Level",12501,"Selector Switch"],               // TOP18  x NR: WP-Pana Stil ST-- Selector Switch - make 4 levels -- 0= off - 10= Sillent 1 - 20= Sillent 2 - 30= Sillent 3  IDX Ook bij andere flow invullen
+            ["Holiday_Mode_State",12903,"Switch"],                      //SET2 // TOP19  x NR: WP-Vakantiemodus -- Light/Switch
+            ["ThreeWay_Valve_State",12904,"Selector Switch"],           // TOP20  x NR: WP-3 Weg ST  -- Selector Switch -- make 2 levels -- 0=Room, 10=DHW
+            ["Outside_Pipe_Temp",12905],                                // TOP21  x NR: WP-Outside_Pipe_Temp  -- Temp
+            //["DHW_Heat_Delta", null],                                 // TOP22    Your name here  -- Temp
+            ["Heat_Delta",12906],                 	                    // TOP23  x NR: WP-Cv Delta T -- Temp
+            ["Cool_Delta",12907],                                       // TOP24  x NR: WP-Koel Delta T -- Temp
+            //["DHW_Holiday_Shift_Temp", null],                         // TOP25    Your name here  -- Temp
+            ["Defrosting_State",12908,"Switch"],                        // TOP26  x NR: WP-Defrost status -- Light/Switch
+            ["Z1_Heat_Request_Temp",12961],         	                // TOP27  ? NR: WP-Z1 Shift W -- Temp
+            ["Z1_Cool_Request_Temp",12962],                             // TOP28  ? NR: WP-Z1 Shift K -- Temp
+            ["Z1_Heat_Curve_Target_High_Temp",12911],                   // TOP29  x NR: WP-Curve W Hoog -- Temp
+            ["Z1_Heat_Curve_Target_Low_Temp",12912],                    // TOP30  x NR: WP-Curve W Laag -- Temp
+            ["Z1_Heat_Curve_Outside_High_Temp",12913],                  // TOP31  x NR: WP-Curve B Hoog -- Temp
+            ["Z1_Heat_Curve_Outside_Low_Temp",12914],                   // TOP32  x NR: WP-Curve B Laag -- Temp
+            ["Room_Thermostat_Temp",12933],                             // TOP33  x NR: WP-Kamerthermostaat-- Thermostat SetPoint or temp
+            //["Z2_Heat_Request_Temp",null],                            // TOP34    NR: WP-Z2 Shift W -- Temp
+            //["Z2_Cool_Request_Temp",null],                            // TOP35    NR: WP-Z2 Shift K -- Temp
+            ["Z1_Water_Temp",12917],                                    // TOP36  ?	NR: WP-Z1 Water -- Temp
+            //["Z2_Water_Temp",12918],                                  // TOP37    NR: WP-Z2 Water -- Temp
+			      ["Cool_Energy_Production",12919],                           // TOP38  ? NR: WP-Energie Productie Koude -- Usage
+            ["Cool_Energy_Consumption",12920],                          // TOP39  ?  NR: WP-Energie Verbruik Koude -- Usage
+			      //["DHW_Energy_Production", null],                          // TOP40    Your name here -- Usage
+            //["DHW_Energy_Consumption",null],                          // TOP41    Your name here -- Usage
+            ["Z1_Water_Target_Temp", 12918],                            // TOP42  x	NR: WP-Z1 Water Doel -- Temp
+            //["Z2_Water_Target_Temp", 12922],                          // TOP43    NR: WP-Z2 Water Doel -- Temp
+            ["Error",12954],                       	                    // TOP44  x	NR: WP-Error -- Alert
+            ["Room_Holiday_Shift_Temp", 12926],                         // TOP45  x	NR: WP-Holiday -- Temp
+            //["Buffer_Temp", null],                                    // TOP46    Your name here  -- Temp
+            //["Solar_Temp", null],                                     // TOP47    Your name here  -- Temp
+            //["Pool_Temp", null],                                      // TOP48    Your name here  -- Temp
+            ["Main_Hex_Outlet_Temp",12927],                             // TOP49  x	NR: WP-Hex? -- Temp
+            ["Discharge_Temp", 12929],                                  // TOP50  x NR: WP-Discharge temp -- Temp
+            ["Inside_Pipe_Temp", 12930],                                // TOP51  x	NR: WP-Inside Pipe -- Temp
+            //["Defrost_Temp", 12931],                                  // TOP52	NR: WP-Defrost -- Temp -- Cut in Pana Mono
+            ["Eva Outlet_Temp", 12932],                                 // TOP53  /	NR: WP-EvaOutlet -- Temp
+            //["Bypass Outlet_Temp", 12933],                            // TOP54	NR: WP-BypassOutlet -- Temp -- Cut in Pana Mono
+            ["Ipm_Temp", 12934],                                        // TOP55  x	NR: WP-IPM -- Temp
+            ["Z1_Temp", 12935],                                         // TOP56  x NR: WP-Z1 Actueel -- Temp 
+            //["Z2_Temp", 12936],                                       // TOP57    NR: WP-Z2_Temp -- Temp
+            //["DHW_Heater_State", 12937, "Switch"],                    // TOP58    NR: WP-Tankheater -- Light/Switch 
+            ["Room_Heater_State", 12938],                               // TOP59  /	NR: WP-Backupheater Toestaan -- Light/Switch
+            ["Internal_Heater_State	",12587],                           // TOP60  / NR: WP-InternalHeater Status -- Light/Switch
+            ["External_Heater_State", 12957],                           // TOP61  / NR: WP-ExternalHeater Status -- Light/Switch
+            ["Fan1_Motor_Speed", 12940],                                // TOP62  x	NR: WP-Fan Speed -- Custom Sensor	-- Unit = r/Minute
+            //["Fan2 Motor_Speed", null],                               // TOP63    Your name here -- Custom Sensor	-- Unit = r/Minute
+            ["High_Pressure", 12941],                                   // TOP64  x	NR: WP-High_Pressure -- Custom Sensor -- Unit = Kgf/cm2
+            ["Pump_Speed",12942],                                       // TOP65  x NR: WP-Pump speed  -- Custom Sensor -- Unit = r/min	
+            ["Low_Pressure",12943],                                     // TOP66  /	NR: WP-Low_Pressure -- Custom Sensor -- Unit = Kgf/cm2
+            ["Compressor_Current",12944],                               // TOP67    NR: WP - Current -- Custom Sensor -- Unit = Ampere
+            ["Force_Heater_State",12945],                               // TOP68	NR: WP-ForceHeater_State -- Light/Switch
+            //["Sterilization_State", null],                            // TOP69	Your name here -- Light/Switch
+            //["Sterilization_Temp", null],                             // TOP70    Your name here  -- Temp   
+            //["Sterilization_Max_Time", null],                         // TOP71    Your name here  -- Custom Sensor -- Unit = Minutes
+			      //["Z1_Cool_Curve_Target_High_Temp	", null],               // TOP72 	Your name here  -- Temp	
+			      //["Z1_Cool_Curve_Target_Low_Temp", null],                  // TOP73 	Your name here  -- Temp
+			      //["Z1_Cool_Curve_Outside_High_Temp", null],                // TOP74 	Your name here  -- Temp	
+			      ["Z1_Cool_Curve_Outside_Low_Temp", null],                   // TOP75 	Your name here  -- Temp	
+			      ["Heating_Mode",12960, "Selector Switch"],                  // TOP76	NR: WP-Heating_Mode -- Selector Switch -- make 4 levels - (0=comp heat/direct cool, 10=comp heat+cool, 20=direct heat+cool, 30=direct heat/comp cool)
+			["Heating_Off_Outdoor_Temp	", null],  				        // TOP77 
+			["Heater_On_Outdoor_Temp", null],                   	    // TOP78
+			["Heat_To_Cool_Temp", null],                    	        // TOP79 
+            ["Cool_To_Heat_Temp"],                                      //TOP80
+            ["Cooling_Mode"],                                           //TOP81
+            ["Z2_Heat_Curve_Target_High_Temp"],                         //TOP82
+            ["Z2_Heat_Curve_Target_Low_Temp"],                          //TOP83
+            ["Z2_Heat_Curve_Outside_High_Temp"],                        //TOP84
+            ["Z2_Heat_Curve_Outside_Low_Temp"],                         //TOP85
+            ["Z2_Cool_Curve_Target_High_Temp"],                         //TOP86
+            ["Z2_Cool_Curve_Target_Low_Temp"],                          //TOP87
+            ["Z2_Cool_Curve_Outside_High_Temp"],                        //TOP88
+            ["Z2_Cool_Curve_Outside_Low_Temp"],                         //TOP89
+            ["Room_Heater_Operations_Hours"],                           //TOP90
+            ["DHW_Heater_Operations_Hours"],                            //TOP91
+    ];
+    
+context.global.heishamon.ActionMapping = [
+    // actioncommand, type, "IDx in Domoticz/Name in Home Assistant/ ?? openHAB ??" 
+    ["SetHeatpump", "Switch", 12500],                                   //SET1  // TOP0   x  NR: WP-Pana Aan / Uit -- Light/Switch 
+    ["SetHolidayMode", "Switch", 12903],					            //SET2  // TOP19    NR: WP-Vakantiemodus -- Light/Switch
+	["SetQuietMode", "Selector Switch", 12959],			                //SET3    NR: WP-Pana Stil-- Selector Switch - make 4 levels -- 0= off - 10= Sillent 1 - 20= Sillent 2 - 30= Sillent 3  
+    ["SetPowerfulMode", "Selector Switch", 12955],                      //SET4  // New      NP: WP-Power selector -- Selector Switch -- make 4 levels -- 0= off - 10= 30 Minute - 20= 60 Minute - 30= 90 Minute
+    ["SetZ1HeatRequestTemperature", "Thermostat", 12956],               //SET5	// New      NP: WP-Z1 Shift W -- Thermostat SetPoint
+    ["SetZ1CoolRequestTemperature	", "Thermostat", 12948],            //SET6  // TOP28    NR: WP-Z1 Shift K -- Thermostat	SetPoint
+    //["SetZ2HeatRequestTemperature", "Thermostat", 12949],             //SET7  // TOP34    NR: WP-Z2 Shift W -- Thermostat	SetPoint
+    //["SetZ2CoolRequestTemperature", "Thermostat", 12950],             //SET8  // TOP35    NR: WP-Z2 Shift K -- Thermostat	SetPoint
+    ["SetOperationMode	", "Selector Switch", 12896],			        //SET9 	// TOP4     NR: WP-Mode -- Selector Switch -- make 7 levels - (0=Heat only, 10=Cool only, 20=Auto, 30=DHW only, 40=Heat+DHW, 50=Cool+DHW, 60=Auto+DHW)
+    //["SetForceDHW", "Switch", 12897],				                    //SET10	// TOP2     NR: WP-Warmwater Status -- Light/Switch
+    //["SetDHWTemp	", "Thermostat", 12952],                            //SET11 // New      NR: WP-DHW Temp	    Thermostat	SetPoint           
+    ["SetForceDefrost", "Thermostat", 12952],                           //SET12 // New      NR: WP-Koel Temp	Thermostat	SetPoint
+    ["SetForceSterilization", "Switch", 12958],                         //SET13 // New  	NR: WP-ForceHeater -- Light/Switch
+    //["SetForceSterilization", "Switch", null]                         //SET14 // New      Your name here -- Light/Switch
+    
+    
+];
+return msg;
