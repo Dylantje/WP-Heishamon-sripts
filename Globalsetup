@@ -10,11 +10,11 @@ context.global.heishamon.HAapplication = "Domoticz, InfluxDB";
 
 //This is the overview of sensors which has to be sent to the Home Automation system
 context.global.heishamon.SensorMapping = [
-        // ["name of topic", "IDx in Domoticz/Name in Home Assistant/ ?? openHAB ??"]
+        // [  "name of topic",  "IDx in Domoticz                                                                    "]
          //                  Dummy IDX              -----    ------     Set--- Topic---- Custom Device name ---- Device type -- Units                           
             //["Heatpump_State",xxxx,"Switch"],       	            //SET1  //  TOP0   x    WP: Aan - Uit [ NR ] -- Light/Switch 
-            ["Pump_Flow",12524],                      	  		    //  TOP1   x    WP: Waterpomp [ NR ] -- Custom Sensor	-- unit= :L/m 
-            //["Force_DHW_State",xxx,"Switch"],		              //SET10 //  TOP2   
+            ["Pump_Flow",12524],                      	  		            //  TOP1   x    WP: Flow [ NR ] -- Custom Sensor	-- unit= :L/m 
+            //["Force_DHW_State",xxx,"Switch"],		                //SET10 //  TOP2   
             ["Quiet_Mode_Schedule",12501],                    	            //  TOP3   /    WP: Pana Stil ST -- Light/Switch
             //["Operating_Mode_State",12896,"Selector Switch"],     //SET9  //  TOP4   x    NR: WP-Mode State -- Selector Switch -- make 7 levels - (0=Heat only, 10=Cool only, 20=Auto, 30=DHW only, 40=Heat+DHW, 50=Cool+DHW, 60=Auto+DHW)
             ["Main_Inlet_Temp",12494],                                      //  TOP5   x    WP: Instroom [ NR ] [ Retour ] -- Temp
@@ -27,8 +27,8 @@ context.global.heishamon.SensorMapping = [
             ["Operations_Counter",12498],                                   //  TOP12  x    WP: Start - Stops [ NR ] -- RFXMeter counter -- unit= x :On / Off
             ["Main_Schedule_State",12899,"Switch"],   	                    //  TOP13  x    WP: Weektimer ST [ NR ] -- Light/Switch
             ["Outside_Temp",12495],                                         //  TOP14  x    WP: Buiten [ NR ] -- Temp
-            ["Heat_Energy_Production",12900],                               //  TOP15  x    WP: Power W [ NR ] -- Usage
-            ["Heat_Energy_Consumption",12901],                              //  TOP16  x    WP: Verbruik [ NR ] -- Usage 
+            ["Heat_Energy_Production",12900],                               //  TOP15  x    WP: Vermogen W [ NR ] -- Usage
+            ["Heat_Energy_Consumption",12901],                              //  TOP16  x    WP: Verbruik W [ NR ]
             ["Powerful_Mode_Time",12955,"Selector Switch"],         //SET4  //  TOP17  x  idx voor time: 12902 WP: Extra Power ST [ NR ] -- Selector Switch -- make 4 levels -- 0= off - 10= 30 Minute - 20= 60 Minute - 30= 90 Minute
             ["Quiet_Mode_Level",12501,"Selector Switch"],                   //  TOP18  x    WP: Pana Stil ST [ NR ]-- Selector Switch - make 4 levels -- 0= off - 10= Sillent 1 - 20= Sillent 2 - 30= Sillent 3  IDX Ook bij andere flow invullen
             ["Holiday_Mode_State",12903,"Switch"],                  //SET2  //  TOP19  x    WP: Vakantiemodus ST [ NR ] -- Light/Switch
@@ -85,7 +85,7 @@ context.global.heishamon.SensorMapping = [
             //["Sterilization_Temp", null],                                 //  TOP70      
             //["Sterilization_Max_Time", null],                             //  TOP71   
             ["Z1_Cool_Curve_Target_High_Temp",12931],                       //  TOP72  x    WP: Cool curve Target High [ NR ]  --- Temp		
-			["Z1_Cool_Curve_Target_Low_Temp",12988],                        //  TOP73  x    WP: Cool curve Target Low [ NR ] --- Temp	
+		["Z1_Cool_Curve_Target_Low_Temp",12988],                        //  TOP73  x    WP: Cool curve Target Low [ NR ] --- Temp	
 			["Z1_Cool_Curve_Outside_High_Temp",13213],                      //  TOP74  x    WP: Cool curve Out High [ NR ] --- Temp	
 			["Z1_Cool_Curve_Outside_Low_Temp",13263],                       //  TOP75  x	WP: Cool curve Out Low [ NR ]  -- Temp	
 			["Heating_Mode",12960,"Selector Switch"],                       //  TOP76  x    WP: Heating_Mode Curve direct [ NR ] -- Selector Switch -- make 4 levels - (0=comp heat/direct cool, 10=comp heat+cool, 20=direct heat+cool, 30=direct heat/comp cool)
