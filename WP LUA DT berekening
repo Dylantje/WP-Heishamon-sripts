@@ -1,0 +1,19 @@
+--script_device_deltaT.lua 
+--This script subtracts two sensors (aanvoer_dv and retour_dv) from eachother and puts the calculated value in a new sensor (to be configured with 'deltat_idx')
+local aanvoer_dv = 'WP Kruip A'
+local retour_dv = 'WP Kruip R'
+local deltat_idx = 12289 --WP Dt Kruipruimte
+
+commandArray = {}
+
+if devicechanged[aanvoer_dv] then
+
+        aanvoer = otherdevices_svalues[aanvoer_dv]
+        retour = otherdevices_svalues[retour_dv]
+        aanvoer_temp = tonumber(aanvoer)
+        retour_temp = tonumber(retour)
+        deltaT = (aanvoer_temp - retour_temp)
+        commandArray['UpdateDevice'] = deltat_idx .. '|0|' .. string.format("%." .. 1 .. "f", aanvoer_temp - retour_temp)
+        print("--- DeltaT_Kruipruimte = " .. deltaT .. " C");
+end
+return commandArray
