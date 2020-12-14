@@ -1,0 +1,26 @@
+return { 
+	on = { timer = { "at 23:58"}}, 
+	
+	execute = function(domoticz)
+		local Date = domoticz.time.year..domoticz.time.month..domoticz.time.day
+		local meantempOutside = domoticz.devices('Buiten Gemiddeld D').temperature
+		local baseTemp = 18
+		local factor = 1
+		local degreesday = baseTemp - meantempOutside
+		if (domoticz.time.month >= 4 and domoticz.time.month <= 9) then factor = 0.8 end
+		if (domoticz.time.month >= 11 or domoticz.time.month <= 2) then factor = 1.1 end
+		degreesdays = degreesday * factor
+	    local GasUsage = domoticz.devices(13511).counterToday / 2
+		local GasUsageperDegreesday = domoticz.utils.round((GasUsage / degreesdays),2)
+		if (degreesday <= 0) then
+			degreesdays = 0
+			GasUsageperDegreesday = 0
+		end
+
+		domoticz.log('Gemiddelde temperatuur buiten (laatste 24u): '..meantempOutside)
+		domoticz.log('Gasverbruik vandaag: '..GasUsage..' m3')
+		domoticz.log('Aantal graaddagen: '..degreesdays)
+		domoticz.log('Gasverbruik: '..GasUsageperDegreesday..' m3 per graaddag')
+		domoticz.devices('WP Graaddag').updateCustomSensor(GasUsageperDegreesday)
+	end
+}
