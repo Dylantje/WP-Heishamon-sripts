@@ -1,0 +1,51 @@
+return {
+
+    on = {
+        timer = {
+			'every minute'       
+        --devices = { 
+                  -- 12901    -- NR: WP-Verbruik
+                  }
+         },
+    logging = {
+        --level = domoticz.LOG_DEBUG, -- Uncomment to override the dzVents global logging setting and use debug
+        marker = "WP-COP Pana Device HM"
+               },    
+    
+    execute = function(domoticz, item)
+        
+        -- devices
+        --local flowinstValue = domoticz.devices(12496).rawData[1]           -- Flow L/min [ is % device ]
+        local flowinstValue = domoticz.devices(12524).rawData[1]             -- Flow custom sensor ivm liters /minuut   WP Flow HM
+        --local flowinstValue = 16                                           -- Flow L/min  (fixed value)
+        local tempoutValue = domoticz.devices(12493).rawData[1]              -- Temperature Heatpump out                WP Uitstroom Aanvoer HM
+        local tempreturnValue = domoticz.devices(12494).rawData[1]           -- Temperature Heatpump return             WP Instroom Retour HM
+        local powerHeatpump = domoticz.devices(12901).rawData[1]             -- HEatpump power adsorbed in watt         WP Verbruik W HM
+        local frequentie = domoticz.devices(12526).rawData[1]                -- HEatpump frquentie in Herz              WP Frequentie HM
+        local sCOP = domoticz.devices(12963)                                 -- Cop (dummy- custom sensor W/W )         WP COP NR DZ 	
+        
+        -- calculation
+        local Watt_heat_c = math.abs(domoticz.utils.round((tempoutValue-tempreturnValue) * 4.187 * (flowinstValue/60)*1000))
+        local COP_calculated = math.abs(domoticz.utils.round(Watt_heat_c/powerHeatpump,2))
+
+        domoticz.log('flowinstValue ' .. flowinstValue .. ' L/min ', domoticz.LOG_DEBUG)    
+        domoticz.log('tempoutValue ' .. tempoutValue .. ' C ', domoticz.LOG_DEBUG)    
+        domoticz.log('tempreturnValue ' .. tempreturnValue .. ' C ', domoticz.LOG_DEBUG)    
+        domoticz.log('powerHeatpump ' .. powerHeatpump .. ' Watt ', domoticz.LOG_DEBUG)    
+        domoticz.log('Watt_heat_c ' .. Watt_heat_c .. ' Watt ', domoticz.LOG_DEBUG)        
+        domoticz.log('COP_calculated ' .. COP_calculated .. ' W/W ', domoticz.LOG_DEBUG)
+
+
+       if tonumber(powerHeatpump) > 180 and COP_calculated < 24 and tonumber(frequentie) > 16 then -- was 11 maar geeft vertekent beeld in grafana  -- DIT ERBIJ???:  and tonumber(frequentie) > 80
+
+       --if tonumber(powerHeatpump) > 175 and COP_calculated < 24 and tonumber(flowinstValue) < 15  and tonumber(frequentie) > 1 then -- was 11 maar geeft vertekent beeld in grafana  -- DIT ERBIJ???:  and tonumber(frequentie) > 80
+        domoticz.openURL('http://127.0.0.1:8080/json.htm?type=command&param=udevice&idx=12963'..'&nvalue=0&svalue='..COP_calculated) --WP COP NR DZ
+        domoticz.openURL('http://127.0.0.1:8080/json.htm?type=command&param=udevice&idx=12964'..'&nvalue=0&svalue='..Watt_heat_c)    --WP  Vermogen direct Pana  HM
+        else 
+        domoticz.openURL('http://127.0.0.1:8080/json.htm?type=command&param=udevice&idx=12963'..'&nvalue=0&svalue=0') --WP COP NR DZ
+        domoticz.openURL('http://127.0.0.1:8080/json.htm?type=command&param=udevice&idx=12964'..'&nvalue=0&svalue=0') --WP  Vermogen direct Pana  HM
+        end     
+
+    end
+    
+}
