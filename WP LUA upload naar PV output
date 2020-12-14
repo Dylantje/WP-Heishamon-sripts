@@ -1,0 +1,76 @@
+return {
+    active = true,
+    logging = {
+        --level = domoticz.LOG_DEBUG, -- Uncomment to override the dzVents global logging setting and use debug
+        marker = 'WP to PVOutput'
+    },
+   on = {
+      timer = {
+         'every 5 minutes'   -- The number of minutes between posts to PVoutput (normal is 5 but when in donation mode it's max 1)
+      },
+      httpResponses = { 'triggerPVoutput' }
+   },
+   execute = function(domoticz,item)
+       
+        ----------------------------------------------------------------------------------------------------------
+        -- PVoutput parameters
+        ----------------------------------------------------------------------------------------------------------
+        local PVoutputApi = 'c53c834fxxxxxxxxxxxxxxxx1cbf65a3210ea535'      -- Your PVoutput api key
+        local PVoutputSystemID = '158xx'                                    -- Your PVoutput System ID
+        local PVoutputURL = 'http://pvoutput.org/service/r2/addstatus.jsp'  -- The URL to the PVoutput Service
+        ----------------------------------------------------------------------------------------------------------
+        -- Domoticz Sensor parameters
+        ----------------------------------------------------------------------------------------------------------
+         --domoticz.log('WP to PVOutput script running', domoticz.LOG_DEBUG)
+
+        if (item.isTimer) then
+            local EnergyConsumption = domoticz.devices(13511).counterToday *1000                    -- WP: Verbruik [ Fl ]
+            local PowerConsumption  = domoticz.devices(13511).usage                                 -- WP: Verbruik [ Fl ]
+
+            local Flow  = domoticz.devices(12524).rawData[1]                                        -- ''WP: Flow [ NR ]
+            local Taanvoer = domoticz.devices(12257).rawData[1]                                     --  WP: Aanvoer [ ESP ]
+            local Tretour = domoticz.devices(12258).rawData[1]                                      --  WP: Retour [ ESP ]
+            local TDiff = math.abs(domoticz.utils.round((Taanvoer-Tretour),2))                      -- 
+            local PowerProduced  = domoticz.devices(12513).rawData[1]                               -- WP: Vermogen [ Script ]
+ --         local EnergyProduced  = domoticz.devices(ProducedSensor).counterToday*1000                 --
+            local Cop = domoticz.devices(12514).rawData[1]                                           -- WP: COP [ Script ]
+
+            domoticz.log('EnergyConsumption is :'..EnergyConsumption..' Wh', domoticz.LOG_DEBUG)
+            domoticz.log('PowerConsumption is :'..PowerConsumption..' watt', domoticz.LOG_DEBUG)
+            domoticz.log('Flow is :'..Flow..' l/min', domoticz.LOG_DEBUG)
+            domoticz.log('Taanvoer is :'..Taanvoer..' graden', domoticz.LOG_DEBUG)
+            domoticz.log('Tretour is :'..Tretour..' graden', domoticz.LOG_DEBUG)
+            domoticz.log('TDiff is :'..TDiff..' graden', domoticz.LOG_DEBUG)
+            domoticz.log('Cop is :'..Cop..' W/W', domoticz.LOG_DEBUG)
+
+            domoticz.log('Call PVOutput url with callback', domoticz.LOG_DEBUG)
+            --ASYNC openUrl
+            domoticz.openURL({
+                                url = PVoutputURL..'?d='..os.date("%Y%m%d")..'&t='..os.date("%H:%M")..'&v1='..EnergyConsumption..'&v2='..PowerConsumption.. '&v6='..Cop ..'&v7='..TDiff..'&v8='..Flow..'&v9='..Cop..'&v10='..PowerProduced,
+                                method = 'GET',
+                                callback = 'triggerPVoutput',
+                                headers = { ['X-Pvoutput-Apikey'] = PVoutputApi, 
+                                            ['X-Pvoutput-SystemId'] = PVoutputSystemID
+                                          }
+                            })
+        end
+
+        if (item.isHTTPResponse) then 
+            domoticz.log('Callback from url requested. Statuscode:'..item.statusCode, domoticz.LOG_DEBUG)
+
+            if (item.ok) then
+                local valid = string.find(item.data, "OK 200: Added Status")  
+                if (valid ~= nil) then
+                    domoticz.log('Response received from PVOutput: '..item.data, domoticz.LOG_DEBUG)
+        
+                    domoticz.log('Current status successfully uploaded to PVoutput.', domoticz.LOG_INFO)
+                else
+                    domoticz.log('Current status NOT successfully uploaded to PVoutput -> '..item.data, domoticz.LOG_ERROR)
+                end
+            else
+                domoticz.log('Current status NOT successfully uploaded to PVoutput. Statuscode:'..item.statusCode, domoticz.LOG_ERROR)
+            end        
+        end
+    end
+
+}
