@@ -1,0 +1,32 @@
+Installeer met Putty: sudo apt-get install jq
+
+Maak een crontab: 56 23 * * * /home/pi/domoticz/scripts/mindergas.sh
+
+Vraag een token aan bij mindergas.nl
+
+Maak in de script map van Domoticz een bestandje: mindergas.sh
+Maak dit documentje octaal: 0775
+
+Zet dit in je document:
+
+#!/bin/bash
+
+#Token to authenicate with mindergas.nl
+TOKEN=je gekregen token
+
+#fetch meterstand (use jq to parse JSON object correctly)
+METERSTAND=`curl -s "http://192.168.5.70:8080/json.htm?type=devices&rid= Je TEXT sensor IDX" | jq '.result[0].Data'| tr -d '"' | cut -c 1-6`
+
+#Get OS date, and format it corectly.
+NOW=$(date +"%Y-%m-%d")
+
+#Build JSON by hand ;-)
+JSON='{ "date":"'$NOW'", "reading":"'$METERSTAND'" }'
+echo $METERSTAND meters
+echo $METERSTAND meterstandjes
+#post using curl to API
+curl -v -H "Content-Type:application/json" -H "AUTH-TOKEN:$TOKEN" -d "$JSON" https://www.mindergas.nl/api/gas_meter_readings
+
+
+
+
