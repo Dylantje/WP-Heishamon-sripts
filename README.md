@@ -1,4 +1,4 @@
-# Heisha-mon-Global-setup
+# WP settings
 Copy Paste this global setup to yours
 Make the dummys like the comment says
 Change the idx to yours from Domoticz
