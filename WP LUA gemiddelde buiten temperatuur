@@ -1,0 +1,57 @@
+local function DeviceUpdate(idx, value1)
+    local cmd = string.format("%d|0|%.2f", idx, value1)
+  --print(cmd)
+    table.insert (commandArray, { ['UpdateDevice'] = cmd } )
+end
+
+Debug = "Yes" -- Debugging aanzetten ("YES") of uitzetten ("NO")
+ 
+commandArray = {}
+ 
+local m = os.date('%M')
+if (m % 2 == 0) then -- script loopt iedere 4 minuten
+
+-- Variabelen instellen
+local temperature_name	= 'Buiten Gemiddeld D'
+local temperature_idx	= otherdevices_idx[temperature_name]
+
+--local uitlees_name	= 'Oosterhout Temp Dark DZ'
+local uitlees_idx	= 939 --otherdevices_idx[uitlees_name] was 939
+
+--Temperaturen van afgelopen 24 uur opvragen
+local sQuery			= 'curl "http://192.168.5.70:8080/json.htm?type=graph&sensor=temp&idx='..tostring(uitlees_idx)..'&range=day"'
+local handle=assert(io.popen(sQuery))
+local raw = handle:read('*all')
+handle:close()
+
+--Ontvangen waarden verwerken
+json = assert(loadfile '/home/pi/domoticz/scripts/lua/JSON.lua')()
+local jsonData = json:decode(raw)
+
+if Debug=='YES' then
+  print (jsonData.title)
+  print (jsonData.status)
+  print (jsonData.result[1].d)
+  print (jsonData.result[1].te)
+end
+
+--Gemiddelde temperatuur van afgelopen 24 uur bepalen
+local sum = 0
+local ave = 0
+local elements = #jsonData.result
+     
+for i = 1, elements do
+    sum = sum + jsonData.result[i].te
+end
+     
+ave = sum / elements
+
+if Debug=='YES' then
+  print('--- Gemiddeld: '..tostring(ave))
+end
+
+--Gemiddelde temperatuur opslaan in virtuele temperatuur sensor
+DeviceUpdate(temperature_idx,ave)
+
+end
+return commandArray
