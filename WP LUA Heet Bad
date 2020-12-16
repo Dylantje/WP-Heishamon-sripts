@@ -1,0 +1,24 @@
+return {
+    on = {     
+            devices = {'Bad'},
+            timer = {'every 5 minutes'}
+            },
+
+    execute = function(domoticz, item, info, timer, device, group)
+        local Bad = domoticz.devices('Bad')
+        local Sensor = domoticz.devices('Warmwater boilervat onder')
+
+    if Bad.active and Sensor.temperature <= 69 then
+        domoticz.openURL('http://192.168.2.4:8080/json.htm?type=command&param=switchlight&idx=170&switchcmd=On')
+        domoticz.openURL('http://192.168.2.4:8080/json.htm?type=command&param=switchlight&idx=171&switchcmd=Set%20Level&level=30')
+        domoticz.openURL('http://192.168.2.4:8080/json.htm?type=command&param=udevice&idx=173&svalue=65')
+       
+    elseif Bad.active and Sensor.temperature > 69 then 
+        Bad.switchOff()
+        domoticz.openURL('http://192.168.2.4:8080/json.htm?type=command&param=udevice&idx=173&svalue=55')
+        domoticz.openURL('http://192.168.2.4:8080/json.htm?type=command&param=switchlight&idx=171&switchcmd=Set%20Level&level=40')
+
+end
+
+end
+}
